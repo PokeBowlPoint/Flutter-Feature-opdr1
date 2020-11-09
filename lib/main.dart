@@ -10,27 +10,31 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cat Portal',
+      title: 'Flutter feature - opdracht 1',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Cat Portal'),
+          title: Text('Flutter feature - opdracht 1'),
+          backgroundColor: Colors.grey,
         ),
-        body: Center(child: CatListView()),
+        body: Center(child: CatsListView()),
       ),
     );
   }
 }
 
-class Cat {
+class Cats {
   final String name;
   final String image;
   final String breed;
   final String dob;
 
-  Cat({this.name, this.image, this.breed, this.dob});
+  Cats({this.name,
+    this.image,
+    this.breed,
+    this.dob});
 
-  factory Cat.fromJson(Map<String, dynamic> json) {
-    return Cat(
+  factory Cats.fromJson(Map<String, dynamic> json) {
+    return Cats(
       name: json['name'],
       image: json['image'],
       breed: json['breed'],
@@ -39,7 +43,7 @@ class Cat {
   }
 }
 
-class CatListView extends StatelessWidget {
+class CatsListView extends StatelessWidget {
 
   var data;
 
@@ -47,38 +51,41 @@ class CatListView extends StatelessWidget {
 
 
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Cat>>(
-      future: _fetchJobs(),
+    return FutureBuilder<List<Cats>>(
+      future: _fetchCats(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          List<Cat> data = snapshot.data;
-          return _jobsListView(data);
+          List<Cats> data = snapshot.data;
+          return _catsListView(data);
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
-        return CircularProgressIndicator();
+        return LinearProgressIndicator();
       },
     );
   }
 
-  Future<List<Cat>> _fetchJobs() async {
-    final jobsListAPIUrl =
+  Future<List<Cats>> _fetchCats() async {
+    final catsApi =
         'http://hers.hosts1.ma-cloud.nl/catabase/getcats.php';
-    final response = await http.get(jobsListAPIUrl);
+    final response = await http.get(catsApi);
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body)['cats'];
-      return jsonResponse.map((job) => new Cat.fromJson(job)).toList();
+      return jsonResponse.map((cats) => new Cats.fromJson(cats)).toList();
     } else {
-      throw Exception('Failed to load jobs from API');
+      throw Exception('Kon geen cats uit API laden');
     }
   }
 
-  ListView _jobsListView(data) {
+  ListView _catsListView(data) {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: (context, index) {
-          return _tile(data[index].image, data[index].name, data[index].breed, data[index].dob);
+          return _tile( data[index].image,
+              data[index].name,
+              data[index].breed,
+              data[index].dob);
         });
   }
 
@@ -88,10 +95,15 @@ class CatListView extends StatelessWidget {
       ),
       title: Text(title,
           style: TextStyle(
-            fontWeight: FontWeight.w500,
             fontSize: 20,
           )),
-      subtitle: Text(subtitle),
-      trailing: Text(trailing));
+      subtitle: Text(subtitle,
+          style: TextStyle(
+            fontSize: 18,
+          )),
+      trailing: Text(trailing,
+        style: TextStyle(
+          fontSize: 18,
+        ),));
 }
 
